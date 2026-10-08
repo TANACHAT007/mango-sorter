@@ -13,7 +13,7 @@
    1.182
   ]
  ],
- "triangles": 296158,
+ "triangles": 269843,
  "paddles": {
   "P1": {
    "pivot": [
@@ -41,12 +41,12 @@
  "weigh": {
   "pivot_y": 0.45,
   "pivot_z": 0.798,
-  "present": false
+  "present": true
  },
  "moving_parts": {
-  "P1": 6,
-  "P2": 6,
-  "P3": 6,
-  "W": 0
+  "P1": 10,
+  "P2": 10,
+  "P3": 10,
+  "W": 15
  }
 }
