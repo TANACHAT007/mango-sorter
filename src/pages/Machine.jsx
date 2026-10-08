@@ -1,17 +1,25 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useI18n } from '../contexts/I18nContext'
 import { MACHINE } from '../config'
 
 // renders exported from the Fusion model (copied into public/img by the project's build step)
-const SHOTS = ['iso', 'cu_weigh', 'cu_tunnel_paddle', 'cu_inside_tunnel', 'cu_servo_mount', 'cu_cabinet_boards', 'cu_back_side', 'front']
+const ORDER = ['iso', 'cu_weigh', 'cu_tunnel_paddle', 'cu_inside_tunnel', 'cu_servo_mount', 'cu_chute_hanger', 'cu_drive', 'cu_encoder',
+  'cu_cabinet', 'cu_cabinet_boards', 'cu_back_side', 'front', 'top', 'right']
 const img = (n) => `${import.meta.env.BASE_URL}img/${n}.jpg`
 
 export default function Machine() {
   const { t, lang } = useI18n()
   const [zoom, setZoom] = useState(null)
-  const [missing, setMissing] = useState({})
-  const shots = SHOTS.filter((s) => !missing[s])
+  const [have, setHave] = useState([])
+  // public/img/index.json lists the images that really exist (written by scripts/sync_images.py)
+  useEffect(() => {
+    fetch(import.meta.env.BASE_URL + 'img/index.json').then((r) => (r.ok ? r.json() : [])).then(setHave).catch(() => setHave([]))
+  }, [])
+  const shots = ORDER.filter((s) => have.includes(s))
+  const flows = have.filter((s) => s.startsWith('flow_'))
+  const wiring = have.includes('wiring')
   const specs = [
     ['spec_size', MACHINE.size], ['spec_belt', MACHINE.belt], ['spec_capacity', MACHINE.capacity],
     ['spec_weigh', t('spec_weigh_v')], ['spec_vision', t('spec_vision_v')], ['spec_ctrl', t('spec_ctrl_v')],
@@ -22,10 +30,15 @@ export default function Machine() {
         <h1 className="text-2xl">{t('machine_title')}</h1>
         <p className="muted">{MACHINE.name[lang]}</p>
       </div>
+      <Link to="/3d" className="card flex items-center gap-3 p-4 transition hover:border-primary-400">
+        <span className="grid h-11 w-11 place-items-center rounded-xl bg-primary-100 text-xl dark:bg-primary-900/40">🧊</span>
+        <span className="flex-1"><b>{t('view3d_title')}</b><br /><span className="muted text-sm">{t('view3d_open')}</span></span>
+        <span className="btn-primary text-sm">{t('nav_3d')}</span>
+      </Link>
 
       {shots.length > 0 && (
         <button className="card overflow-hidden" onClick={() => setZoom(shots[0])}>
-          <img src={img(shots[0])} alt="" className="max-h-[460px] w-full object-cover" onError={() => setMissing((m) => ({ ...m, [shots[0]]: true }))} />
+          <img src={img(shots[0])} alt="" className="max-h-[460px] w-full object-cover" />
         </button>
       )}
 
@@ -57,7 +70,21 @@ export default function Machine() {
           <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
             {shots.slice(1).map((s) => (
               <motion.button key={s} whileHover={{ scale: 1.02 }} className="card overflow-hidden" onClick={() => setZoom(s)}>
-                <img src={img(s)} alt="" loading="lazy" className="aspect-[4/3] w-full object-cover" onError={() => setMissing((m) => ({ ...m, [s]: true }))} />
+                <img src={img(s)} alt="" loading="lazy" className="aspect-[4/3] w-full object-cover" />
+              </motion.button>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {(flows.length > 0 || wiring) && (
+        <section>
+          <h2 className="mb-3 text-lg">{t('diagrams')}</h2>
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+            {[...flows, ...(wiring ? ['wiring'] : [])].map((s) => (
+              <motion.button key={s} whileHover={{ scale: 1.02 }} className="card overflow-hidden bg-white" onClick={() => setZoom(s)}>
+                <img src={img(s)} alt="" loading="lazy" className="aspect-[4/3] w-full bg-white object-contain p-2" />
+                <div className="border-t border-black/5 px-3 py-2 text-left text-sm text-ink-700">{t('dia_' + s.replace(/^flow_fc\d_/, 'fc_'))}</div>
               </motion.button>
             ))}
           </div>

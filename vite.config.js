@@ -29,8 +29,9 @@ export default defineConfig({
       },
       workbox: {
         navigateFallback: BASE + 'index.html',
-        globIgnores: ['**/img/**'],
+        globIgnores: ['**/img/**', '**/model/**'],
         runtimeCaching: [
+          { urlPattern: /\/model\//, handler: 'StaleWhileRevalidate', options: { cacheName: 'machine-model' } },
           { urlPattern: /\/img\//, handler: 'CacheFirst', options: { cacheName: 'machine-images', expiration: { maxEntries: 40 } } },
           { urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com\//, handler: 'StaleWhileRevalidate', options: { cacheName: 'fonts' } },
         ],
