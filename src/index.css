@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { -webkit-tap-highlight-color: transparent; }
+  body { @apply bg-surface text-ink-800 font-sans antialiased dark:bg-ink-900 dark:text-stone-100; }
+  h1, h2, h3 { @apply font-semibold tracking-tight; }
+}
+
+@layer components {
+  .card { @apply rounded-2xl bg-white shadow-soft border border-black/5 dark:bg-ink-800 dark:border-white/10; }
+  .btn-primary { @apply inline-flex items-center justify-center gap-2 rounded-xl bg-primary-500 px-4 py-2.5 font-medium text-white transition hover:bg-primary-600 active:scale-[.98] disabled:opacity-50; }
+  .btn-ghost { @apply inline-flex items-center justify-center gap-2 rounded-xl px-3 py-2 font-medium text-ink-700 transition hover:bg-black/5 dark:text-stone-200 dark:hover:bg-white/10; }
+  .chip { @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium; }
+  .muted { @apply text-stone-500 dark:text-stone-400; }
+  .num { font-variant-numeric: tabular-nums; }
+}
+
+/* lot report: print as one clean A4 page */
+@media print {
+  @page { size: A4; margin: 14mm; }
+  body { background: #fff !important; color: #111 !important; }
+  .no-print { display: none !important; }
+  .card { box-shadow: none !important; border-color: #ddd !important; background: #fff !important; }
+  .print-area { margin: 0 !important; padding: 0 !important; max-width: none !important; }
+}
