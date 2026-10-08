@@ -25,6 +25,7 @@ ARM_Z = (753.5, 818.0)                 # paddle arm + hub + inserts live in this
 W_PIVOT = (450.0, 798.0)               # weigh cradle tilt axis (along x): y, z
 W_BOX = ((44.5, 141.0), (340.0, 472.0), (750.0, 835.0))     # x, y, z box of everything that tilts with the cradle
 
+SKIP_COMPONENTS = ('Sample_Mangoes',)
 raw = os.path.join(OUT, '_raw.glb')
 if '--reuse' not in sys.argv or not os.path.exists(raw):
     import cascadio
@@ -61,6 +62,8 @@ for node in scene.graph.nodes_geometry:
     m.apply_transform(T)
     col = colour_of(m)
     comp = node.split(':')[0]
+    if comp in SKIP_COMPONENTS:                 # demo fruit drawn in the CAD — the viewer animates its own
+        continue
     parts = [m]
     if comp in ('Paddle_Diverters', 'Weigh_Station'):
         try:
@@ -111,3 +114,15 @@ meta = {'units': 'm', 'up': 'Z', 'bounds': np.round(out.bounds, 4).tolist(), 'tr
         'moving_parts': {k: v for k, v in count.items() if k != 'static'}}
 json.dump(meta, open(os.path.join(OUT, 'machine.json'), 'w'), indent=1)
 print('machine.glb', round(os.path.getsize(glb) / 1e6, 2), 'MB', tris, 'triangles', len(out.geometry), 'meshes', 'moving', meta['moving_parts'])
+
+# ---- compress for the web (meshopt) and remove the intermediates -------------------------------------------------------
+import subprocess
+npx = 'npx.cmd' if os.name == 'nt' else 'npx'
+w = os.path.join(OUT, '_w.glb')
+final = os.path.join(OUT, 'machine.min.glb')
+subprocess.run([npx, '--yes', '@gltf-transform/cli@latest', 'weld', glb, w], check=True, capture_output=True)
+subprocess.run([npx, '--yes', '@gltf-transform/cli@latest', 'meshopt', w, final], check=True, capture_output=True)
+for f in (raw, w, glb):
+    if os.path.exists(f):
+        os.remove(f)
+print('machine.min.glb', round(os.path.getsize(final) / 1e6, 2), 'MB')

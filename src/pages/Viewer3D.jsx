@@ -140,6 +140,10 @@ export default function Viewer3D() {
     resize()
 
     const paddleAng = { P1: 0, P2: 0, P3: 0 }
+    let replay = []                          // recent fruit records, replayed in a loop whenever no new one arrives
+    let replayAt = 0
+    let idle = 99                            // journey-seconds since the last fruit was fed
+    let onSpawn = () => {}
     let tilt = 0
     let prev = performance.now()
     let raf = 0
@@ -147,6 +151,13 @@ export default function Viewer3D() {
       raf = requestAnimationFrame(tick)
       const dt = Math.min(0.05, (now - prev) / 1000) * speedRef.current
       prev = now
+      idle += dt
+      if (idle > 3.2 && replay.length && cad.children.length > 0) {      // keep the line running by itself
+        const it = replay[replayAt % replay.length]
+        replayAt++
+        api.current.spawn(it)
+        onSpawn(it)
+      }
       const want = { P1: 0, P2: 0, P3: 0 }
       let wantTilt = 0
       const hasW = Boolean(nodes.W)
@@ -183,7 +194,9 @@ export default function Viewer3D() {
         mesh.position.set(0.095, 0.4, 2)
         cad.add(mesh)
         fruits.push({ c: item.c, g: item.g, t: Math.min(0, youngest - 2.6), mesh })
+        idle = 0
       },
+      setReplay(items, cb) { replay = items; onSpawn = cb || onSpawn },
       view(name) {
         const v = { iso: [-0.75, 1.55, 1.25], top: [0.6, 3.1, -0.499], front: [0.6, 0.95, 2.3], feed: [-1.25, 1.15, -0.25] }[name]
         camera.position.set(...v)
@@ -205,11 +218,13 @@ export default function Viewer3D() {
   const seen = useRef(null)
   useEffect(() => {
     if (state !== 'ready' || !list.length) return
-    if (seen.current === null) {                     // first load: show the latest fruit only, do not replay the whole lot
-      seen.current = new Set(list.slice(0, -1).map(([k]) => k))
+    api.current?.setReplay(list.slice(-40).map(([, it]) => it), setLast)
+    if (seen.current === null) {                     // first load: everything already recorded is replay material
+      seen.current = new Set(list.map(([k]) => k))
+      return
     }
     for (const [k, it] of list) {
-      if (!seen.current.has(k)) {
+      if (!seen.current.has(k)) {                    // a fruit that was sorted just now → show it straight away
         seen.current.add(k)
         api.current?.spawn(it)
         setLast(it)
