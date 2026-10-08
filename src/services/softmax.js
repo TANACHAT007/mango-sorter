@@ -11,8 +11,8 @@ function standardise(X) {
   for (const x of X) for (let j = 0; j < d; j++) mu[j] += x[j]
   for (let j = 0; j < d; j++) mu[j] /= X.length
   for (const x of X) for (let j = 0; j < d; j++) sigma[j] += (x[j] - mu[j]) ** 2
-  for (let j = 0; j < d; j++) sigma[j] = Math.sqrt(sigma[j] / X.length) || 1      // constant feature → divide by 1
-  for (let j = 0; j < d; j++) if (sigma[j] < 1e-6) sigma[j] = 1
+  // floor at 0.01 like the machine-side reference trainer: a nearly constant feature must not blow z up on a new fruit
+  for (let j = 0; j < d; j++) sigma[j] = Math.max(Math.sqrt(sigma[j] / X.length), 0.01)
   return { mu, sigma }
 }
 
@@ -34,7 +34,7 @@ export function predict(model, f) {
 }
 
 /** X: number[][], y: class index[] → { mu, sigma, W, b }.  Full-batch gradient descent, deterministic (zero init). */
-export function fit(X, y, nClass, { epochs = 500, lr = 0.3, l2 = 1e-3 } = {}) {
+export function fit(X, y, nClass, { epochs = 600, lr = 0.5, l2 = 0.01 } = {}) {
   const n = X.length, d = X[0].length
   const { mu, sigma } = standardise(X)
   const Z = X.map((x) => scale(x, mu, sigma))

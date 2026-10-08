@@ -9,5 +9,5 @@ const { model, cv } = trainModel(samples, 1)
 console.log('cv acc', cv.acc, 'n', cv.n, 'confusion', JSON.stringify(cv.confusion))
 const p = predict(model, centre.defect)
 console.log('predict defect centre →', p.c, p.conf.toFixed(3), '| constant feature sigma', model.sigma[3])
-if (cv.acc < 0.9 || p.c !== 'defect' || model.W.length !== 4 || model.W[0].length !== 4 || model.sigma[3] !== 1) { console.error('FAIL'); process.exit(1) }
+if (cv.acc < 0.9 || p.c !== 'defect' || model.W.length !== 4 || model.W[0].length !== 4 || model.sigma[3] !== 0.01) { console.error('FAIL'); process.exit(1) }
 console.log('OK')
