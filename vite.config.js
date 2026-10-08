@@ -7,10 +7,12 @@ const BASE = '/mango-sorter/'
 
 export default defineConfig({
   base: BASE,
+  define: { __BUILD__: JSON.stringify(String(Date.now())) },      // cache-buster for the 3D model and images
   plugins: [
     react(),
     VitePWA({
       registerType: 'autoUpdate',
+      injectRegister: null,                // registered in main.jsx so a new version reloads the page by itself
       includeAssets: ['favicon.svg', 'offline.html'],
       manifest: {
         name: 'Mango Sorter — เครื่องคัดแยกมะม่วง',
@@ -31,7 +33,7 @@ export default defineConfig({
         navigateFallback: BASE + 'index.html',
         globIgnores: ['**/img/**', '**/model/**'],
         runtimeCaching: [
-          { urlPattern: /\/model\//, handler: 'StaleWhileRevalidate', options: { cacheName: 'machine-model' } },
+          { urlPattern: /\/model\//, handler: 'CacheFirst', options: { cacheName: 'machine-model', expiration: { maxEntries: 3 } } },
           { urlPattern: /\/img\//, handler: 'CacheFirst', options: { cacheName: 'machine-images', expiration: { maxEntries: 40 } } },
           { urlPattern: /^https:\/\/fonts\.(googleapis|gstatic)\.com\//, handler: 'StaleWhileRevalidate', options: { cacheName: 'fonts' } },
         ],

@@ -7,7 +7,7 @@ import { MACHINE } from '../config'
 // renders exported from the Fusion model (copied into public/img by the project's build step)
 const ORDER = ['iso', 'cu_weigh', 'cu_tunnel_paddle', 'cu_inside_tunnel', 'cu_servo_mount', 'cu_chute_hanger', 'cu_drive', 'cu_encoder',
   'cu_cabinet', 'cu_cabinet_boards', 'cu_back_side', 'front', 'top', 'right']
-const img = (n) => `${import.meta.env.BASE_URL}img/${n}.jpg`
+const img = (n) => `${import.meta.env.BASE_URL}img/${n}.jpg?v=${__BUILD__}`
 
 export default function Machine() {
   const { t, lang } = useI18n()
@@ -15,7 +15,7 @@ export default function Machine() {
   const [have, setHave] = useState([])
   // public/img/index.json lists the images that really exist (written by scripts/sync_images.py)
   useEffect(() => {
-    fetch(import.meta.env.BASE_URL + 'img/index.json').then((r) => (r.ok ? r.json() : [])).then(setHave).catch(() => setHave([]))
+    fetch(import.meta.env.BASE_URL + 'img/index.json?v=' + __BUILD__).then((r) => (r.ok ? r.json() : [])).then(setHave).catch(() => setHave([]))
   }, [])
   const shots = ORDER.filter((s) => have.includes(s))
   const flows = have.filter((s) => s.startsWith('flow_'))

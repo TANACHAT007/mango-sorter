@@ -116,7 +116,7 @@ export default function Viewer3D() {
     const loader = new GLTFLoader()
     loader.setMeshoptDecoder(MeshoptDecoder)
     let disposed = false
-    loader.load(import.meta.env.BASE_URL + 'model/machine.min.glb', (gltf) => {
+    loader.load(import.meta.env.BASE_URL + 'model/machine.min.glb?v=' + __BUILD__, (gltf) => {
       if (disposed) return
       gltf.scene.traverse((o) => {
         if (['P1', 'P2', 'P3', 'W'].includes(o.name)) nodes[o.name] = o
