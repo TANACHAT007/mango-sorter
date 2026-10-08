@@ -1,7 +1,40 @@
 {
   "rules": {
-    ".read": true,
+    ".read": false,
     ".write": false,
-    "items": { "$lot": { ".indexOn": ["t"] } }
+    "machine": { ".read": true },
+    "lots": { ".read": true },
+    "items": { ".read": true, "$lot": { ".indexOn": ["t"] } },
+    "live": { ".read": true },
+    "crops": { ".read": true, "$lot": { ".indexOn": ["t"] } },
+    "model": {
+      ".read": true,
+      "current": {
+        ".write": "auth != null && root.child('admins').child(auth.uid).val() === true",
+        ".validate": "newData.hasChildren(['version', 'fv', 'classes', 'mu', 'sigma', 'W', 'b'])"
+      },
+      "history": {
+        "$v": { ".write": "auth != null && root.child('admins').child(auth.uid).val() === true" }
+      }
+    },
+    "labels": {
+      ".read": true,
+      "$lot": {
+        "$item": {
+          ".write": "auth != null && root.child('admins').child(auth.uid).val() === true",
+          ".validate": "!newData.exists() || (newData.child('c').isString() && newData.child('c').val().matches(/^(ripe|half_ripe|green|defect|skip)$/) && newData.child('t').isNumber())"
+        }
+      }
+    },
+    "admins": {
+      "$uid": { ".read": "auth != null && auth.uid === $uid" }
+    },
+    "admin_requests": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid && !data.exists()",
+        ".validate": "newData.child('name').isString() && newData.child('name').val().length <= 60 && newData.child('t').isNumber()"
+      }
+    }
   }
 }

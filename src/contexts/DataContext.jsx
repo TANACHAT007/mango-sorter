@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useMemo, useRef, useState } from 'react'
-import { firebaseConfig } from '../config'
+import { configured, fbDb } from '../services/firebase'
 import { buildDemo, demoNextItem } from '../services/demoData'
 
 // Realtime Database layout (written by the machine's Raspberry Pi, read-only for the web):
@@ -7,7 +7,6 @@ import { buildDemo, demoNextItem } from '../services/demoData'
 //   lots/<lotId>          { id, name, variety, started: ms, ended: ms | null }
 //   items/<lotId>/<push>  { t: ms, g: grams, c: 'ripe' | 'half_ripe' | 'green' | 'defect', conf: 0..1 }
 const Ctx = createContext(null)
-const configured = Boolean(firebaseConfig.apiKey && firebaseConfig.databaseURL)
 
 export function DataProvider({ children }) {
   const [lots, setLots] = useState({})
@@ -25,9 +24,7 @@ export function DataProvider({ children }) {
     let cancelled = false
     ;(async () => {
       try {
-        const { initializeApp } = await import('firebase/app')
-        const { getDatabase, ref, onValue } = await import('firebase/database')
-        const db = getDatabase(initializeApp(firebaseConfig))
+        const { db, ref, onValue } = await fbDb()
         fb.current = { db, ref, onValue }
         if (cancelled) return
         off.push(onValue(ref(db, 'lots'), (s) => {

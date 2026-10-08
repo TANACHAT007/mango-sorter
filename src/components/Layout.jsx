@@ -11,6 +11,8 @@ const ICONS = {
   dash: 'M4 13h6V4H4zM14 20h6v-9h-6zM4 20h6v-3H4zM14 7h6V4h-6z',
   lots: 'M4 7l8-4 8 4-8 4zM4 7v10l8 4 8-4V7M12 11v10',
   machine: 'M3 16h18M5 16V9h10l4 3v4M7 20a2 2 0 100-4 2 2 0 000 4zM17 20a2 2 0 100-4 2 2 0 000 4z',
+  cam: 'M4 8h3l2-3h6l2 3h3v11H4zM12 17a3.5 3.5 0 100-7 3.5 3.5 0 000 7z',
+  train: 'M4 19V5M4 19h16M8 15l3-4 3 2 5-7',
   cube: 'M12 3l8 4.5v9L12 21l-8-4.5v-9zM12 12l8-4.5M12 12L4 7.5M12 12v9',
   sun: 'M12 4V2M12 22v-2M4 12H2M22 12h-2M6 6L4.5 4.5M19.5 19.5L18 18M6 18l-1.5 1.5M19.5 4.5L18 6M12 16a4 4 0 100-8 4 4 0 000 8z',
   moon: 'M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z',
@@ -18,7 +20,9 @@ const ICONS = {
 const NAV = [
   { to: '/', key: 'nav_dashboard', icon: 'dash', end: true },
   { to: '/lots', key: 'nav_lots', icon: 'lots' },
+  { to: '/camera', key: 'nav_camera', icon: 'cam' },
   { to: '/3d', key: 'nav_3d', icon: 'cube' },
+  { to: '/train', key: 'nav_train', icon: 'train' },
   { to: '/machine', key: 'nav_machine', icon: 'machine' },
 ]
 
@@ -98,9 +102,9 @@ export default function Layout({ children }) {
       <main className="print-area mx-auto max-w-6xl px-4 pb-28 pt-5 lg:px-8 lg:pb-10">{children}</main>
 
       {/* bottom nav (mobile) */}
-      <nav className="no-print fixed inset-x-0 bottom-0 z-30 grid grid-cols-4 border-t border-black/5 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur dark:border-white/10 dark:bg-ink-800/95 lg:hidden">
+      <nav className="no-print fixed inset-x-0 bottom-0 z-30 grid grid-cols-6 border-t border-black/5 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur dark:border-white/10 dark:bg-ink-800/95 lg:hidden">
         {NAV.map((n) => (
-          <NavLink key={n.to} to={n.to} end={n.end} className={({ isActive }) => `flex flex-col items-center gap-0.5 py-2.5 text-xs font-medium ${isActive ? 'text-primary-600 dark:text-primary-300' : 'muted'}`}>
+          <NavLink key={n.to} to={n.to} end={n.end} className={({ isActive }) => `flex flex-col items-center gap-0.5 py-2.5 text-[10px] font-medium leading-tight ${isActive ? 'text-primary-600 dark:text-primary-300' : 'muted'}`}>
             <Icon d={ICONS[n.icon]} />{t(n.key)}
           </NavLink>
         ))}

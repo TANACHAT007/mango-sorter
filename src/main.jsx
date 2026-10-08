@@ -6,6 +6,7 @@ import App from './App.jsx'
 import { ThemeProvider } from './contexts/ThemeContext'
 import { I18nProvider } from './contexts/I18nContext'
 import { DataProvider } from './contexts/DataContext'
+import { AdminProvider } from './contexts/AdminContext'
 
 // HashRouter: GitHub Pages has no SPA rewrite, so deep links (…/#/lot/LOT-001 from a QR code) must not 404
 createRoot(document.getElementById('root')).render(
@@ -14,7 +15,9 @@ createRoot(document.getElementById('root')).render(
       <ThemeProvider>
         <I18nProvider>
           <DataProvider>
-            <App />
+            <AdminProvider>
+              <App />
+            </AdminProvider>
           </DataProvider>
         </I18nProvider>
       </ThemeProvider>

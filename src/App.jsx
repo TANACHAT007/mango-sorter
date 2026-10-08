@@ -6,6 +6,8 @@ import Dashboard from './pages/Dashboard'
 import Lots from './pages/Lots'
 import LotReport from './pages/LotReport'
 import Machine from './pages/Machine'
+import Camera from './pages/Camera'
+import Train from './pages/Train'
 
 const Viewer3D = lazy(() => import('./pages/Viewer3D'))   // three.js is loaded only when this page is opened
 
@@ -25,6 +27,8 @@ export default function App() {
           <Route path="/lots" element={<Page><Lots /></Page>} />
           <Route path="/lot/:id" element={<Page><LotReport /></Page>} />
           <Route path="/machine" element={<Page><Machine /></Page>} />
+          <Route path="/camera" element={<Page><Camera /></Page>} />
+          <Route path="/train" element={<Page><Train /></Page>} />
           <Route path="/3d" element={<Page><Suspense fallback={<div className="muted py-20 text-center">…</div>}><Viewer3D /></Suspense></Page>} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
